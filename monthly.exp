@@ -6,25 +6,26 @@ proc color {foreground text} {
 }
 
 set env(USER)
-set command "<insert-command>"
+set command ""
 
-if {[string trim $env(USER)] eq "root"} {
+        if {[string trim $env(USER)] eq "root"} {
 
-   send_user "\n"
-   send_user "\n[color 5 {Monthly Expect:: }]must not be logged in as root ... [color 1 {(FAILURE)}]\n"
-   send_user "\n"
-   exit 1
+                send_user "\n"
+                send_user "\n[color 5 {Monthly Expect:: }]must not be logged in as root ... [color 1 {(FAILURE)}]\n"
+                send_user "\n"
+                exit 1
 
-} else {
-   send_user "\n"
-   send_user "\n[color 5 {Monthly Expect:: }]welcome to monthly expect ... [color 2 {(OK)}]\n"
-   send_user "\n"
-}
+        } else {
+                send_user "\n"
+                send_user "\n[color 5 {Monthly Expect:: }]welcome to monthly expect ... [color 2 {(OK)}]\n"
+                send_user "\n"
+        }
 
 stty -echo
 send_user -- "\n[color 5 {Monthly Expect::Phase 1/2:: }]enter your password ... [color 1 {(WAIT)}]\n"
 expect_user -re "(.*)\n"
 stty echo
+
 set pass $expect_out(1,string)
 send_user "\n[color 5 {Monthly Expect::Phase 1/2:: }]password collected continuing ... [color 2 {(OK)}]\n"
 send_user "\n"
@@ -39,36 +40,34 @@ send_user "\n[color 5 {Monthly Expect::Phase 2/2:: }]list variable collected ...
 send_user "\n"
 
 set path [pwd]
-
 set x [open "$path/$list"]
 set hosts [split [read $x] "\n"]
 close $x
 
-foreach x $hosts {
+        foreach x $hosts {
 
-   if {[string trim $x] eq ""} then break
+                if {[string trim $x] eq ""} then break
 
-   spawn ssh $env(USER)@$x
-   expect "password:"
-   send_user "\n"
-   send_user "\n[color 5 {Monthly Expect:: }]logging in as $env(USER) on $x ... [color 2 {(OK)}]\n"
-   send -- "$pass\r"
-   expect "$env(USER)@"
-   sleep 1
-   send "/usr/bin/sudo su -\r"
-   expect " password for "
-   send_user "\n"
-   send_user "\n[color 5 {Monthly Expect:: }]logging in as root on $x ... [color 2 {(OK)}]\n"
-   send -- "$pass\r"
-   sleep 1
-   send_user "\n[color 5 {Monthly Expect:: }]running monthly report on $x ... [color 2 {(OK)}]\n"
-   send "$command\r"
-   interact -o "Monthly Review Complete" return
-   sleep 1
-   send_user "\n"
-   send_user "\n[color 5 {Monthly Expect:: }]finished with $x moving onto the next ... [color 2 {(OK)}]\n"
-   close
-}
+                        spawn ssh $env(USER)@$x
+                        expect "password:"
+                        send_user "\n"
+                        send_user "\n[color 5 {Monthly Expect:: }]logging in as $env(USER) on $x ... [color 2 {(OK)}]\n"
+                        send -- "$pass\r"
+                        expect "$env(USER)@"
+                        send "/usr/bin/sudo su -\r"
+                        expect " password for "
+                        send_user "\n"
+                        send_user "\n[color 5 {Monthly Expect:: }]logging in as root on $x ... [color 2 {(OK)}]\n"
+                        send -- "$pass\r"
+                        send_user "\n[color 5 {Monthly Expect:: }]running monthly report on $x ... [color 2 {(OK)}]\n"
+                        sleep 1
+                        send "$command\r"
+                        interact -o "Monthly Review Complete" return
+                        send_user "\n"
+                        send_user "\n[color 5 {Monthly Expect:: }]finished with $x moving onto the next ... [color 2 {(OK)}]\n"
+                        close
+                }
+
 send_user "\n[color 5 {Monthly Expect:: }]end of the list all finished ... [color 2 {(OK)}]\n"
 send_user "\n[color 5 {Monthly Expect:: }]exiting application ... [color 2 {(OK)}]\n"
 send_user "\n"
